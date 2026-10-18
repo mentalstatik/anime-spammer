@@ -459,7 +459,7 @@ class SlideshowApp:
         ttk.Button(command_row, text="Submit", command=self._q).pack(
             side="left", padx=(8, 0)
         )
-         ttk.Label(frame, text="❤️ with love from mentalstatic ❤️").pack(
+                ttk.Label(frame, text="❤️ with love from mentalstatic ❤️").pack(
             anchor="center", pady=(4, 0)
         )
 
