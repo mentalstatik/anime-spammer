@@ -5,7 +5,7 @@ What anime spammer does is open a little window with a riddle. Every 10 secondes
 
 # features
 
-6000 anime girl images
+1000+ anime girl images
 
 15 sound effects
 
