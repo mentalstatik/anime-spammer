@@ -1,9 +1,15 @@
 name: Build downloads
 
 # Runs when you publish a release, builds single-file apps, and attaches them to that release.
+# You can also run it by hand from the Actions tab and type a tag like v1.0.0.
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to attach the files to (for example v1.0.0)"
+        required: true
 
 permissions:
   contents: write
@@ -21,10 +27,12 @@ jobs:
             extra: --windowed
           - os: ubuntu-latest
             name: Aneemay-Linux
-            file: Aneemay-Linux
+            file: Aneemay-Linux.tar.gz
             sep: ":"
             extra: ""
     runs-on: ${{ matrix.os }}
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
     defaults:
       run:
         shell: bash
@@ -55,7 +63,19 @@ jobs:
             --add-data "media${{ matrix.sep }}media" \
             main.py
 
+      - name: Pack Linux app (keeps it runnable after download)
+        if: runner.os == 'Linux'
+        run: |
+          chmod +x dist/Aneemay-Linux
+          tar -czf dist/Aneemay-Linux.tar.gz -C dist Aneemay-Linux
+
+      - name: Remove the old raw Linux file from the release
+        if: runner.os == 'Linux'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release delete-asset "$TAG" Aneemay-Linux --yes || true
+
       - name: Attach to the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" "dist/${{ matrix.file }}" --clobber
+        run: gh release upload "$TAG" "dist/${{ matrix.file }}" --clobber
